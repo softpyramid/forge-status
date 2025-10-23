@@ -5,6 +5,7 @@ namespace Softpyramid\ForgeStatus;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Softpyramid\ForgeStatus\View\Components\DeploymentIndicator;
+use Softpyramid\ForgeStatus\Console\Commands\ForgeStatusRoutesCommand;
 
 class ForgeStatusServiceProvider extends ServiceProvider
 {
@@ -31,5 +32,12 @@ class ForgeStatusServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/config/forge-status.php' => config_path('forge-status.php'),
         ], 'forge-status-config');
+        
+        // Register console commands for debugging
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                ForgeStatusRoutesCommand::class,
+            ]);
+        }
     }
 }

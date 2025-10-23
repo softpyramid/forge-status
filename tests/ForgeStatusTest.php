@@ -62,4 +62,35 @@ class ForgeStatusTest extends TestCase
             'timestamp' => null,
         ]);
     }
+
+    public function test_routes_are_registered()
+    {
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('forge-status.webhook'));
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('forge-status.check'));
+    }
+
+    public function test_webhook_route_accepts_post_requests()
+    {
+        $response = $this->post('/forge-webhook', [
+            'status' => 'deploying',
+            'site_name' => 'Test Site',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Webhook received']);
+    }
+
+    public function test_status_route_accepts_get_requests()
+    {
+        $response = $this->get('/forge-status');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'site_name',
+            'branch',
+            'commit',
+            'timestamp',
+        ]);
+    }
 }

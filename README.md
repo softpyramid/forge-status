@@ -30,6 +30,8 @@ Real-time deployment status indicator for Laravel Forge using webhooks. Get inst
 composer require softpyramid/forge-status
 ```
 
+The package will automatically register its routes and service provider. No manual configuration needed!
+
 ## Configuration
 
 ### 1. Publish config (optional):
@@ -96,6 +98,24 @@ composer test
 
 # Run tests with coverage
 composer test-coverage
+```
+
+## Debugging
+
+### Check if routes are registered
+
+```bash
+php artisan forge-status:routes
+```
+
+This command will show you all registered Forge Status routes and verify they're working correctly.
+
+### Manual route discovery
+
+If routes aren't auto-registered, run:
+
+```bash
+php artisan package:discover
 ```
 
 ## Troubleshooting
