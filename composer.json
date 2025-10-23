@@ -1,0 +1,31 @@
+{
+    "name": "softpyramid/forge-status",
+    "description": "Real-time Laravel Forge deployment status indicator via webhooks",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fakhar Zaman Khan",
+            "email": "fakhar@softpyramid.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0",
+        "illuminate/broadcasting": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Softpyramid\\ForgeStatus\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Softpyramid\\ForgeStatus\\ForgeStatusServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
