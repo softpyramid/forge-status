@@ -5,8 +5,6 @@ namespace Softpyramid\ForgeStatus\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
-use Softpyramid\ForgeStatus\Events\DeploymentStarted;
-use Softpyramid\ForgeStatus\Events\DeploymentFinished;
 
 class ForgeWebhookController extends Controller
 {
@@ -34,13 +32,6 @@ class ForgeWebhookController extends Controller
         ];
 
         Cache::put('forge-deployment-status', $deploymentData, config('forge-status.status_ttl'));
-
-        // Broadcast events based on status
-        if ($status === 'deploying') {
-            event(new DeploymentStarted($siteName, $branch, $commit));
-        } elseif (in_array($status, ['success', 'failed'])) {
-            event(new DeploymentFinished($siteName, $status, $branch));
-        }
 
         return response()->json(['message' => 'Webhook received']);
     }

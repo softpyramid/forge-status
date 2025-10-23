@@ -1,4 +1,3 @@
-@if(config('broadcasting.default') !== 'null')
 <div id="forge-deployment-indicator" 
      class="fixed {{ config('forge-status.position') === 'top-right' ? 'top-4 right-4' : '' }}
             {{ config('forge-status.position') === 'top-left' ? 'top-4 left-4' : '' }}
@@ -52,6 +51,9 @@
     const successIcon = document.getElementById('forge-status-success');
     const failedIcon = document.getElementById('forge-status-failed');
     
+    let lastStatus = null;
+    let pollInterval = {{ config('forge-status.poll_interval', 5) }} * 1000; // Default 5 seconds
+    
     function hideAllIcons() {
         deployingIcon.classList.add('hidden');
         successIcon.classList.add('hidden');
@@ -87,31 +89,38 @@
         }
     }
     
-    // Check initial status on page load
-    fetch('{{ route('forge-status.check') }}', {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'deploying') {
-            showDeploymentStatus(data);
-        }
-    })
-    .catch(error => console.error('Forge status check failed:', error));
-    
-    // Listen for real-time broadcast events
-    if (typeof Echo !== 'undefined') {
-        Echo.channel('forge-deployments')
-            .listen('.deployment.started', (data) => {
-                showDeploymentStatus(data);
-            })
-            .listen('.deployment.finished', (data) => {
-                showDeploymentStatus(data);
-            });
+    function checkDeploymentStatus() {
+        fetch('{{ route('forge-status.check') }}', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Only update if status changed
+            if (data.status !== lastStatus) {
+                lastStatus = data.status;
+                
+                if (data.status === 'deploying') {
+                    showDeploymentStatus(data);
+                } else if (data.status === 'success' || data.status === 'failed') {
+                    showDeploymentStatus(data);
+                } else if (data.status === 'idle' && lastStatus === 'deploying') {
+                    // Deployment finished, hide indicator
+                    indicator.classList.add('hidden');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Forge status check failed:', error);
+        });
     }
+    
+    // Check initial status on page load
+    checkDeploymentStatus();
+    
+    // Poll for status updates
+    setInterval(checkDeploymentStatus, pollInterval);
 })();
 </script>
-@endif

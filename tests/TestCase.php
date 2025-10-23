@@ -29,7 +29,7 @@ abstract class TestCase extends Orchestra
             'prefix' => '',
         ]);
 
-        // Setup broadcasting
-        $app['config']->set('broadcasting.default', 'log');
+        // Setup cache
+        $app['config']->set('cache.default', 'array');
     }
 }

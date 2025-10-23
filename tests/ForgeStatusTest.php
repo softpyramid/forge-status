@@ -3,39 +3,9 @@
 namespace Softpyramid\ForgeStatus\Tests;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Event;
-use Softpyramid\ForgeStatus\Events\DeploymentFinished;
-use Softpyramid\ForgeStatus\Events\DeploymentStarted;
 
 class ForgeStatusTest extends TestCase
 {
-    public function test_deployment_started_event_is_broadcasted()
-    {
-        Event::fake();
-
-        $event = new DeploymentStarted('Test Site', 'main', 'abc123');
-        event($event);
-
-        Event::assertDispatched(DeploymentStarted::class, function ($event) {
-            return $event->siteName === 'Test Site' 
-                && $event->branch === 'main' 
-                && $event->commit === 'abc123';
-        });
-    }
-
-    public function test_deployment_finished_event_is_broadcasted()
-    {
-        Event::fake();
-
-        $event = new DeploymentFinished('Test Site', 'success', 'main');
-        event($event);
-
-        Event::assertDispatched(DeploymentFinished::class, function ($event) {
-            return $event->siteName === 'Test Site' 
-                && $event->status === 'success' 
-                && $event->branch === 'main';
-        });
-    }
 
     public function test_webhook_controller_stores_status_in_cache()
     {

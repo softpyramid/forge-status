@@ -9,20 +9,20 @@ Real-time deployment status indicator for Laravel Forge using webhooks. Get inst
 
 ## Features
 
-- 🚀 **Real-time Updates** - WebSocket-powered live deployment status
+- 🚀 **Real-time Updates** - Simple polling-based live deployment status
 - 🎯 **No Database Required** - Uses cache only for current status
 - 🔗 **Webhook-driven** - Receives deployment events from Laravel Forge
 - 🎨 **Auto-injection** - Automatically appears in your Laravel layouts
-- ⚙️ **Configurable** - Customizable position and authentication
+- ⚙️ **Configurable** - Customizable position, polling interval, and authentication
 - 🎭 **Modern UI** - Beautiful Tailwind CSS styling
 - 📱 **Responsive** - Works on all device sizes
+- 🔧 **Zero Dependencies** - No broadcasting or WebSocket setup required
 
 ## Requirements
 
 - PHP 8.2 or higher
 - Laravel 10, 11, or 12
-- Laravel Broadcasting configured (Pusher/Reverb/Ably)
-- Laravel Echo on frontend
+- No additional dependencies required!
 
 ## Installation
 
@@ -38,25 +38,16 @@ composer require softpyramid/forge-status
 php artisan vendor:publish --tag=forge-status-config
 ```
 
-### 2. Set up Broadcasting
-
-This package requires Laravel broadcasting to be configured. Use Pusher, Ably, or Laravel Reverb:
-
-```env
-BROADCAST_DRIVER=pusher
-# or
-BROADCAST_DRIVER=reverb
-```
-
-### 3. Add to .env (optional):
+### 2. Add to .env (optional):
 
 ```env
 FORGE_WEBHOOK_TOKEN=your-secret-token
 FORGE_INDICATOR_POSITION=bottom-right
+FORGE_POLL_INTERVAL=5
 FORGE_AUTH_ONLY=true
 ```
 
-### 4. Register Webhook in Laravel Forge
+### 3. Register Webhook in Laravel Forge
 
 In your Forge site settings:
 
@@ -83,10 +74,11 @@ That's it! The indicator will automatically appear when deployments start and up
 ## How It Works
 
 1. Forge sends webhook POST request when deployment starts/finishes
-2. Package receives webhook and broadcasts event via Laravel Echo
-3. Frontend listens for broadcast and shows/updates indicator
-4. No database storage - uses cache for current status only
-5. Real-time updates via WebSockets
+2. Package receives webhook and stores status in cache
+3. Frontend polls the status endpoint every few seconds
+4. Indicator updates automatically when status changes
+5. No database storage - uses cache for current status only
+6. Simple and reliable - no WebSocket complexity
 
 ## Laravel Version Compatibility
 
@@ -116,20 +108,18 @@ If you encounter issues with Laravel 12, ensure you have:
 2. **Updated dependencies** - run `composer update`
 3. **Cleared caches** - run `php artisan config:clear && php artisan cache:clear`
 
-### Broadcasting Not Working
+### Polling Not Working
 
 Make sure you have:
 
-1. **Broadcasting configured** in your `.env`:
+1. **Polling interval** configured in your `.env`:
    ```env
-   BROADCAST_DRIVER=pusher
-   # or
-   BROADCAST_DRIVER=reverb
+   FORGE_POLL_INTERVAL=5
    ```
 
-2. **Laravel Echo** installed and configured on your frontend
+2. **Status endpoint** is accessible at `/forge-status`
 
-3. **WebSocket server** running (if using Reverb)
+3. **Cache is working** - check your cache configuration
 
 ### Webhook Not Receiving Data
 
