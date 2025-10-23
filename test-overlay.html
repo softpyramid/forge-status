@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forge Status Overlay Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Laravel Forge Status Package Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Test the Deployment Overlay</h2>
+            <p class="text-gray-600 mb-4">
+                Click the buttons below to test different deployment status overlays:
+            </p>
+            
+            <div class="space-x-4">
+                <button onclick="testDeployment('deploying')" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    Test Deploying
+                </button>
+                <button onclick="testDeployment('success')" 
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                    Test Success
+                </button>
+                <button onclick="testDeployment('failed')" 
+                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                    Test Failed
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Test Data</h2>
+            <pre class="bg-gray-100 p-4 rounded text-sm overflow-x-auto"><code>{
+    "status": "success",
+    "site_name": "Site",
+    "branch": null,
+    "commit": "292ca985c2df2fb987983fdf755b5d4729434349",
+    "timestamp": "2025-10-23T22:47:32+00:00"
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Forge Deployment Indicator Overlay -->
+    <div id="forge-deployment-indicator" 
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden transition-all duration-300">
+        
+        <div class="bg-white rounded-lg shadow-xl border border-gray-200 px-8 py-6 max-w-md w-full mx-4">
+            <div class="text-center">
+                <!-- Deploying Spinner -->
+                <div id="forge-status-deploying" class="hidden mb-4">
+                    <svg class="animate-spin h-12 w-12 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                
+                <!-- Success Icon -->
+                <div id="forge-status-success" class="hidden mb-4">
+                    <svg class="h-12 w-12 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                
+                <!-- Failed Icon -->
+                <div id="forge-status-failed" class="hidden mb-4">
+                    <svg class="h-12 w-12 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                
+                <h3 id="forge-status-text" class="text-lg font-semibold text-gray-900 mb-2">Checking status...</h3>
+                <p id="forge-status-detail" class="text-sm text-gray-600 mb-4"></p>
+                
+                <button onclick="hideOverlay()" 
+                        class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="h-5 w-5 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function hideAllIcons() {
+            document.getElementById('forge-status-deploying').classList.add('hidden');
+            document.getElementById('forge-status-success').classList.add('hidden');
+            document.getElementById('forge-status-failed').classList.add('hidden');
+        }
+        
+        function showDeploymentStatus(data) {
+            const indicator = document.getElementById('forge-deployment-indicator');
+            const statusText = document.getElementById('forge-status-text');
+            const statusDetail = document.getElementById('forge-status-detail');
+            
+            hideAllIcons();
+            indicator.classList.remove('hidden');
+            
+            if (data.status === 'deploying') {
+                document.getElementById('forge-status-deploying').classList.remove('hidden');
+                statusText.textContent = 'Deploying...';
+                statusDetail.textContent = data.branch ? `Branch: ${data.branch}` : data.site_name;
+            } else if (data.status === 'success') {
+                document.getElementById('forge-status-success').classList.remove('hidden');
+                statusText.textContent = 'Deployment Complete!';
+                statusDetail.textContent = 'Site is now live';
+                
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    hideOverlay();
+                }, 5000);
+            } else if (data.status === 'failed') {
+                document.getElementById('forge-status-failed').classList.remove('hidden');
+                statusText.textContent = 'Deployment Failed';
+                statusDetail.textContent = 'Check Forge logs for details';
+                
+                // Hide after 10 seconds
+                setTimeout(() => {
+                    hideOverlay();
+                }, 10000);
+            }
+        }
+        
+        function testDeployment(status) {
+            const testData = {
+                status: status,
+                site_name: 'Test Site',
+                branch: status === 'deploying' ? 'main' : null,
+                commit: '292ca985c2df2fb987983fdf755b5d4729434349',
+                timestamp: new Date().toISOString()
+            };
+            
+            showDeploymentStatus(testData);
+        }
+        
+        function hideOverlay() {
+            document.getElementById('forge-deployment-indicator').classList.add('hidden');
+        }
+        
+        // Auto-test with success status on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testDeployment('success');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

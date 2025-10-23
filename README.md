@@ -100,6 +100,31 @@ composer test
 composer test-coverage
 ```
 
+## Testing
+
+### Test the package functionality
+
+```bash
+# Test with success status (default)
+php artisan forge-status:test
+
+# Test with different statuses
+php artisan forge-status:test --status=deploying
+php artisan forge-status:test --status=success
+php artisan forge-status:test --status=failed
+```
+
+This command will test all package functionality including cache storage, webhook endpoint, and status endpoint.
+
+### Test with your data
+
+```bash
+# Test with the provided data
+php artisan forge-status:test --status=success
+```
+
+Then open your Laravel app in the browser to see the overlay in action!
+
 ## Debugging
 
 ### Check if routes are registered

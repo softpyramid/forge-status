@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Softpyramid\ForgeStatus\View\Components\DeploymentIndicator;
 use Softpyramid\ForgeStatus\Console\Commands\ForgeStatusRoutesCommand;
+use Softpyramid\ForgeStatus\Console\Commands\TestForgeStatusCommand;
 
 class ForgeStatusServiceProvider extends ServiceProvider
 {
@@ -37,6 +38,7 @@ class ForgeStatusServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ForgeStatusRoutesCommand::class,
+                TestForgeStatusCommand::class,
             ]);
         }
     }
