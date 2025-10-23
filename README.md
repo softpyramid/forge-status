@@ -13,7 +13,8 @@ Real-time deployment status indicator for Laravel Forge using webhooks. Get inst
 - 🎯 **No Database Required** - Uses cache only for current status
 - 🔗 **Webhook-driven** - Receives deployment events from Laravel Forge
 - 🎨 **Auto-injection** - Automatically appears in your Laravel layouts
-- ⚙️ **Configurable** - Customizable position, polling interval, and authentication
+- ⚙️ **Configurable** - Customizable polling interval and authentication
+- 🖥️ **Full-Screen Overlay** - Prominent modal-style deployment notifications
 - 🎭 **Modern UI** - Beautiful Tailwind CSS styling
 - 📱 **Responsive** - Works on all device sizes
 - 🔧 **Zero Dependencies** - No broadcasting or WebSocket setup required
@@ -44,7 +45,6 @@ php artisan vendor:publish --tag=forge-status-config
 
 ```env
 FORGE_WEBHOOK_TOKEN=your-secret-token
-FORGE_INDICATOR_POSITION=bottom-right
 FORGE_POLL_INTERVAL=5
 FORGE_AUTH_ONLY=true
 ```
